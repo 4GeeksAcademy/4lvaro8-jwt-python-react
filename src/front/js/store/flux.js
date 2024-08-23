@@ -44,9 +44,48 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return elm;
 				});
 
+
 				//reset the global store
 				setStore({ demo: demo });
-			}
+			},
+
+// AQUI COMIENZAN LAS PETICIONES //
+
+			register: async (email, password) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/register", {
+						method: "POST",
+						headers: {
+							"Content-type": "application/json"
+						},
+						body: JSON.stringify({email: email, password: password })
+					});
+
+					if (!response.ok) {
+						if (response.status === 401) {
+							throw new Error("Email already in use")
+						}
+						else if (response.status === 400) {
+							throw new Error("Invalid email or password format")
+						}
+						else {
+							throw new Error("There was a problem in the registration request")
+						}
+					}
+
+					const data = await response.json();
+					localStorage.setItem("jwt-token", data.token);
+
+					return data;
+				}
+				catch (error) {
+					console.log("Error durin registration", error);
+					throw error;
+				}
+			},
+
+
+
 		}
 	};
 };
