@@ -22,14 +22,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			getMessage: async () => {
-				try{
+				try {
 					// fetching data from the backend
 					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
 					const data = await resp.json()
 					setStore({ message: data.message })
 					// don't forget to return something, that is how the async resolves
 					return data;
-				}catch(error){
+				} catch (error) {
 					console.log("Error loading message from backend", error)
 				}
 			},
@@ -49,7 +49,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ demo: demo });
 			},
 
-// AQUI COMIENZAN LAS PETICIONES //
+			// AQUI COMIENZAN LAS PETICIONES //
 
 			register: async (email, password) => {
 				try {
@@ -58,7 +58,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						headers: {
 							"Content-type": "application/json"
 						},
-						body: JSON.stringify({email: email, password: password })
+						body: JSON.stringify({ email: email, password: password })
 					});
 
 					if (!response.ok) {
@@ -79,10 +79,45 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return data;
 				}
 				catch (error) {
-					console.log("Error durin registration", error);
+					console.log("Error during registration", error);
 					throw error;
 				}
 			},
+
+
+			login: async (email, password) => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/login", {
+						method: "POST",
+						headers: {
+							"Content-type": "application/json"
+						},
+						body: JSON.stringify({ email: email, password: password })
+					})
+
+					if (!response.ok) {
+						if (response.status === 400) {
+							alert("Error en el login")
+							throw ("Invalid email or password format")
+						}
+						else if (response.status === 401) {
+							alert("Algo fue mal, vuelve a introducir el correo y la contraseña")
+							throw ("Invalid credentials")
+						}
+						else {
+							alert("Error en el login")
+							throw Error("There was a problem in the login request ")
+						}
+					}
+
+					const data = await response.json()
+					localStorage.setItem("jwt-token", data.token)
+				}
+				catch (error) {
+					console.log("Error during login", error);
+					throw error;
+				}
+			}
 
 
 
