@@ -2,11 +2,12 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
+from flask_jwt_extended import create_access_token
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db
+from api.models import db, User
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -66,6 +67,53 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0  # avoid cache memory
     return response
+
+
+
+##################################################################################################
+# Rutas
+
+@app.route("/register", methods=["POST"])
+def register_user():
+    data = request.get_json()
+
+    email = data.get("email")
+    password = data.get("password")
+
+    existing_user = User.query.filter_by(email=email).first()
+
+    if existing_user:
+        return jsonify({"error": "User already exist"}), 400
+    
+    user = User(id=User.query.count() + 1, email=email, password=password, is_active=True)
+
+    db.session.add(user)
+    db.session.commit()
+
+    access_token = create_access_token(identity=user.id)
+    return jsonify({"msg": "Usuario creado", "token": access_token, "user_id": user.id}), 201
+
+
+@app.route("/login", methods=["POST"])
+def login_user():
+    data = request.get_json()
+
+    email = data.get("email")
+    password = data.get("password")
+
+    if email and password:
+        user = User.query.filter_by(email=email, password=password)
+
+        if user:
+
+            access_token = create_access_token(identity=user.id)
+            return jsonify({"msg": "Inicio de sesión correcto", "token": access_token, "user_id": user.id}), 201
+        else : 
+            return jsonify({"msg": "Error el usuario no existe"}), 401
+    
+    else:
+        return jsonify({"msg": "Email o contraseña incorrecto"})
+
 
 
 # this only runs if `$ python src/main.py` is executed
