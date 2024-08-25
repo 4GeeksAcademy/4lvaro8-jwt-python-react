@@ -117,6 +117,42 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log("Error during login", error);
 					throw error;
 				}
+			},
+
+
+			verify: async () => {
+				try {
+					const response = await fetch(process.env.BACKEND_URL + "/protected", {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							'Authorization': 'Bearer ' + localStorage.getItem("jwt-token")
+						},
+
+					});
+					if (resp.status == 422) {
+						return false;
+					}
+
+					const data = await response.json();
+
+					if (data.logged_in) {
+						setStore({ logged: data.logged_in })
+						return true
+					} else {
+						return false
+					}
+
+
+				} catch (error) {
+					setStore({ logged: false })
+				}
+			},
+			
+
+			logout: async () => {
+				localStorage.clear()
+				setStore({ logged: false });
 			}
 
 

@@ -2,7 +2,8 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import JWTManager, create_access_token
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
@@ -113,6 +114,19 @@ def login_user():
     
     else:
         return jsonify({"msg": "Email o contraseña incorrecto"})
+    
+
+@app.route("/private", methods=["GET"])
+@jwt_required()
+def protected():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if user:
+        return jsonify({"logged_in": True, "id": user.id}), 200
+    return jsonify({"logged_in": False, "msg": "No autorizado."}), 400
+    
+
 
 
 
