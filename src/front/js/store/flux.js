@@ -48,64 +48,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				//reset the global store
 				setStore({ demo: demo });
 			},
-
-			// AQUI COMIENZAN LAS PETICIONES //
-
-			register: async (email, password) => {
-				try {
-					const response = await fetch(process.env.BACKEND_URL + "/api/register", {
-						method: "POST",
-						headers: { 
-							"Content-Type": "application/json",
-							
-						},
-						body: JSON.stringify({email: email, password: password})
-					});
-				
-					if (!response.ok) {
-						throw new Error("Error en la solicitud de registro");
-					}
-				
-					const data = await response.json();
-					console.log("Usuario registrado:", data);
-					navigate("/login");
-				} catch (error) {
-					console.error("Error:", error.message);
-				}
-				
-			},
-
-
-			login: async (email, password) => {
-				try {
-					const response = await fetch(process.env.BACKEND_URL + "/api/login", {
-						method: "POST",
-						headers: { 
-							"Content-Type": "application/json"
-						},
-						body: JSON.stringify({email: email, password: password})
-					});
-				
-					if (!response.ok) {
-						throw new Error("Error en la solicitud de login");
-					}
-				
-					const data = await response.json();
-					console.log("Usuario autenticado:", data);
-					sessionStorage.setItem("token", data.token);
-					navigate("/private");
-				} catch (error) {
-					console.error("Error:", error.message);
-				}
-			},
-
-			logout: async () => {
-				sessionStorage.clear()
-				setStore({ logged: false });
-			}
-
-
-
 		}
 	};
 };

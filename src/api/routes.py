@@ -17,14 +17,19 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
+# Obtener todos los usuarios:
 
-##################################################################################################
-# Rutas
+@api.route('/usuarios', methods=['GET'])
+def get_all_users():
+    users = User.query.all()
+    
+    # Serializa cada objeto en la lista de usuarios
+    serialized_users = [user.serialize() for user in users]
 
+    return jsonify(serialized_users), 200
 
-
-@api.route("/register", methods=["POST"])
-def register_user():
+@api.route('/registrar', methods=['POST'])
+def create_user():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -35,14 +40,14 @@ def register_user():
         return jsonify({'error': 'User already exists'}), 400
 
     # Crea un nuevo usuario
-    user = User(email=email, password=password)
+    user = User(email=email)
+    user.set_password(password)
     db.session.add(user)
     db.session.commit()
     return jsonify(user.serialize()), 201
 
-
-@api.route("/login", methods=["POST"])
-def login_user():
+@api.route('/login', methods=['POST'])
+def login():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -52,12 +57,9 @@ def login_user():
         access_token = create_access_token(identity=email)
         return jsonify(access_token=access_token), 200
     return jsonify({'error': 'Credenciales inválidas'}), 401
-    
 
-@api.route("/private", methods=["GET"])
+@api.route('/private', methods=['GET'])
 @jwt_required()
-def protected():
+def private():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
-    
-
