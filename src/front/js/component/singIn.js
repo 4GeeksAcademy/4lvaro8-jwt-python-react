@@ -1,33 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import { Context } from "../store/appContext";
 
-export default function Login() {
-    const [loginData, setLoginData] = useState({
-        email: "",
-        password: ""
-    });
-    const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setLoginData({
-            ...loginData,
-            [e.target.name]: e.target.value,
-        });
-    };
+export default function SingIn() {
+   
+    const { actions } = useContext(Context);
+    const navigate = useNavigate()
+
+	const [inputEmail, setInputEmail] = useState("");
+	const [inputPassword, setInputPassword] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const response = await axios.post(process.env.BACKEND_URL + "/api/login", loginData, {
-                headers: { "Content-Type": "application/json" },
-            });
-            console.log("Usuario autenticado:", response.data);
-            sessionStorage.setItem("token", response.data.token);
-            navigate("/private");
-        } catch (error) {
-            console.log("Error de autenticación: " + error.response.data.error);
-        }
+        await actions.login(inputEmail, inputPassword)
+        navigate("/private");
     };
 
     return (
@@ -37,14 +24,14 @@ export default function Login() {
             <form className="from-singUp" onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="email" className="form-label" >Email</label>
-                    <input type="email" className="form-control" placeholder="Introduzca su email" id="email" name="email" value={loginData.email}
-                        onChange={handleChange} required></input>
+                    <input type="email" className="form-control" placeholder="Introduzca su email" id="email" name="email" value={inputEmail} 
+                    onChange={(e) => setInputEmail(e.target.value)} required></input>
                 </div>
 
                 <div className="mb-3">
                     <label for="password" className="form-label">Password</label>
-                    <input type="password" className="form-control" placeholder="Introduzca su contraseña" name="password" id="password"  value={loginData.password}
-                        onChange={handleChange} required></input>
+                    <input type="password" className="form-control" placeholder="Introduzca su contraseña" name="password" id="password"  value={inputPassword}
+                    onChange={(e) => setInputPassword(e.target.value)} required></input>
                 </div>
 
                 <div className="mb-3 form-check">

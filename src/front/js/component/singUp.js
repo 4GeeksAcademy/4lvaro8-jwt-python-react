@@ -1,32 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import { Context } from "../store/appContext";
+
 
 export default function SignUp() {
-    const [signupData, setSignUpData] = useState({
-        email: "",
-        password: ""
-    });
-    const navigate = useNavigate();
+    
+    const { actions } = useContext(Context);
+    const navigate = useNavigate()
 
-    const handleChange = (e) => {
-        setSignUpData({
-            ...signupData,
-            [e.target.name]: e.target.value,
-        });
-    };
-
+	const [inputEmail, setInputEmail] = useState("");
+	const [inputPassword, setInputPassword] = useState("");
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const response = await axios.post(process.env.BACKEND_URL + "//api/registrar", signupData, {
-                headers: { "Content-Type": "application/json" },
-            });
-            console.log("Usuario registrado:", response.data);
-            navigate("/login");
-        } catch (error) {
-            console.log("Ha habido un error: " + error);
-        }
+        await actions.register(inputEmail, inputPassword);
+        navigate("/login");
     };
 
     return (
@@ -36,14 +24,14 @@ export default function SignUp() {
         <form className="from-singUp" onSubmit={handleSubmit}>
             <div className="mb-3">
                 <label htmlFor="email" className="form-label" >Email</label>
-                <input type="email" className="form-control" placeholder="Introduzca su email" id="email" name="email" value={signupData.email}
-                        onChange={handleChange} required></input>
+                <input type="email" className="form-control" placeholder="Introduzca su email" id="email" name="email" value={inputEmail} 
+                onChange={(e) => setInputEmail(e.target.value)} required></input>
             </div>
 
             <div className="mb-3">
                 <label for="password" className="form-label">Password</label>
-                <input type="password" className="form-control" placeholder="Introduzca su contraseña" name="password" id="password" value={signupData.password}
-                        onChange={handleChange} required></input>
+                <input type="password" className="form-control" placeholder="Introduzca su contraseña" name="password" id="password" value={inputPassword}
+                onChange={(e) => setInputPassword(e.target.value)} required></input>
             </div>
 
             <div className="mb-3 form-check">
