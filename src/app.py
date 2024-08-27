@@ -2,8 +2,6 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
-from flask_jwt_extended import JWTManager, create_access_token
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
@@ -71,61 +69,6 @@ def serve_any_other_file(path):
 
 
 
-##################################################################################################
-# Rutas
-
-@app.route("/register", methods=["POST"])
-def register_user():
-    data = request.get_json()
-
-    email = data.get("email")
-    password = data.get("password")
-
-    existing_user = User.query.filter_by(email=email).first()
-
-    if existing_user:
-        return jsonify({"error": "User already exist"}), 400
-    
-    user = User(id=User.query.count() + 1, email=email, password=password, is_active=True)
-
-    db.session.add(user)
-    db.session.commit()
-
-    access_token = create_access_token(identity=user.id)
-    return jsonify({"msg": "Usuario creado", "token": access_token, "user_id": user.id}), 201
-
-
-@app.route("/login", methods=["POST"])
-def login_user():
-    data = request.get_json()
-
-    email = data.get("email")
-    password = data.get("password")
-
-    if email and password:
-        user = User.query.filter_by(email=email, password=password)
-
-        if user:
-
-            access_token = create_access_token(identity=user.id)
-            return jsonify({"msg": "Inicio de sesión correcto", "token": access_token, "user_id": user.id}), 201
-        else : 
-            return jsonify({"msg": "Error el usuario no existe"}), 401
-    
-    else:
-        return jsonify({"msg": "Email o contraseña incorrecto"})
-    
-
-@app.route("/private", methods=["GET"])
-@jwt_required()
-def protected():
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-
-    if user:
-        return jsonify({"logged_in": True, "id": user.id}), 200
-    return jsonify({"logged_in": False, "msg": "No autorizado."}), 400
-    
 
 
 

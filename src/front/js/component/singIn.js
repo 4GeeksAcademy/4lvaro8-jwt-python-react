@@ -35,7 +35,7 @@ const SingIn = () => {
             <form className="from-singUp" onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="InputEmail" className="form-label" >Email</label>
-                    <input type="text" className="form-control" placeholder="Introduzca su email" id="InputEmail" name="InputEmail" value={inputEmail} onChange={(e) => setInputEmail(e.target.value)}></input>
+                    <input type="email" className="form-control" placeholder="Introduzca su email" id="InputEmail" name="InputEmail" value={inputEmail} onChange={(e) => setInputEmail(e.target.value)}></input>
                 </div>
 
                 <div className="mb-3">

@@ -53,105 +53,54 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			register: async (email, password) => {
 				try {
-					const response = await fetch(process.env.BACKEND_URL + "/register", {
+					const response = await fetch(process.env.BACKEND_URL + "/api/register", {
 						method: "POST",
-						headers: {
-							"Content-type": "application/json"
+						headers: { 
+							"Content-Type": "application/json",
+							
 						},
-						body: JSON.stringify({ email: email, password: password })
+						body: JSON.stringify({email: email, password: password})
 					});
-
+				
 					if (!response.ok) {
-						if (response.status === 401) {
-							throw new Error("Email already in use")
-						}
-						else if (response.status === 400) {
-							throw new Error("Invalid email or password format")
-						}
-						else {
-							throw new Error("There was a problem in the registration request")
-						}
+						throw new Error("Error en la solicitud de registro");
 					}
-
+				
 					const data = await response.json();
-					localStorage.setItem("jwt-token", data.token);
-
-					return data;
+					console.log("Usuario registrado:", data);
+					navigate("/login");
+				} catch (error) {
+					console.error("Error:", error.message);
 				}
-				catch (error) {
-					console.log("Error during registration", error);
-					throw error;
-				}
+				
 			},
 
 
 			login: async (email, password) => {
 				try {
-					const response = await fetch(process.env.BACKEND_URL + "/login", {
+					const response = await fetch(process.env.BACKEND_URL + "/api/login", {
 						method: "POST",
-						headers: {
-							"Content-type": "application/json"
+						headers: { 
+							"Content-Type": "application/json"
 						},
-						body: JSON.stringify({ email: email, password: password })
-					})
-
-					if (!response.ok) {
-						if (response.status === 400) {
-							alert("Error en el login")
-							throw ("Invalid email or password format")
-						}
-						else if (response.status === 401) {
-							alert("Algo fue mal, vuelve a introducir el correo y la contraseña")
-							throw ("Invalid credentials")
-						}
-						else {
-							alert("Error en el login")
-							throw Error("There was a problem in the login request ")
-						}
-					}
-
-					const data = await response.json()
-					localStorage.setItem("jwt-token", data.token)
-				}
-				catch (error) {
-					console.log("Error during login", error);
-					throw error;
-				}
-			},
-
-
-			verify: async () => {
-				try {
-					const response = await fetch(process.env.BACKEND_URL + "/protected", {
-						method: "GET",
-						headers: {
-							"Content-Type": "application/json",
-							'Authorization': 'Bearer ' + localStorage.getItem("jwt-token")
-						},
-
+						body: JSON.stringify({email: email, password: password})
 					});
-					if (resp.status == 422) {
-						return false;
+				
+					if (!response.ok) {
+						throw new Error("Error en la solicitud de login");
 					}
-
+				
 					const data = await response.json();
-
-					if (data.logged_in) {
-						setStore({ logged: data.logged_in })
-						return true
-					} else {
-						return false
-					}
-
-
+					console.log("Usuario autenticado:", data);
+					sessionStorage.setItem("token", data.token);
+					navigate("/private");
 				} catch (error) {
-					setStore({ logged: false })
+					console.error("Error:", error.message);
 				}
 			},
-			
 
 			logout: async () => {
-				localStorage.clear()
+				sessionStorage.clear()
 				setStore({ logged: false });
 			}
 
