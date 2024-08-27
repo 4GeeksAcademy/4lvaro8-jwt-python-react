@@ -30,7 +30,7 @@ export default function SignUp() {
     };
 
     return (
-        <div className="container-form m-auto w-50" >
+        <div className="container-form m-auto mt-5 w-50" >
         <h1 className="form-header text-center">SING UP</h1>
 
         <form className="from-singUp" onSubmit={handleSubmit}>

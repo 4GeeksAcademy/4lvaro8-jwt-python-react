@@ -34,12 +34,10 @@ def create_user():
     email = data.get('email')
     password = data.get('password')
 
-    # Verifica si el usuario ya existe
     user = User.query.filter_by(email=email).first()
     if user:
         return jsonify({'error': 'User already exists'}), 400
 
-    # Crea un nuevo usuario
     user = User(email=email)
     user.set_password(password)
     db.session.add(user)

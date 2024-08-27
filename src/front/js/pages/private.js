@@ -12,14 +12,14 @@ export default function Private() {
     }, [navigate]);
 
     const handleLogout = () => {
-        sessionStorage.removeItem("token");
+        sessionStorage.clear();
         navigate("/login");
     };
 
     return (
         <div className="container mt-5">
-            <h2>Página Privada</h2>
-            <p>Bienvenido a la página privada. Solo los usuarios autenticados pueden ver esto.</p>
+            <h2 className="text-center">Solo pueden ver este baile los elegidos</h2>
+            <img src="https://media.tenor.com/Tr4svi_j4zEAAAAM/skeleton-dancing.gif" alt="" />
             <button onClick={handleLogout} className="btn btn-danger">Cerrar Sesión</button>
         </div>
     );
