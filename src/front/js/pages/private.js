@@ -17,8 +17,8 @@ export default function Private() {
     };
 
     return (
-        <div className="container mt-5">
-            <h2 className="text-center">Solo pueden ver este baile los elegidos</h2>
+        <div className="container d-flex flex-column mt-5">
+            <h2 className="text-center">Solo pueden ver este baile los elegidos.</h2>
             <img src="https://media.tenor.com/Tr4svi_j4zEAAAAM/skeleton-dancing.gif" alt="" />
             <button onClick={handleLogout} className="btn btn-danger">Cerrar Sesión</button>
         </div>
